@@ -6,14 +6,17 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from rest_framework.authtoken import views
+from users.views import APISubscribe, APISubscriptions
 
 urlpatterns = [
+    path('api/users/subscriptions/', APISubscriptions.as_view()), 
     path('admin/', admin.site.urls),
     # path('api/auth/token/login/', views.obtain_auth_token),
     path('api/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.authtoken')),
     # url(r'^auth/', include('djoser.urls')),
     # url(r'^auth/', include('djoser.urls.authtoken')),
+    path('api/users/<int:pk>/subscribe/', APISubscribe.as_view()),
 ]
 
 schema_view = get_schema_view(

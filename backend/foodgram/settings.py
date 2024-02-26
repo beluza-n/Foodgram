@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework.authtoken',
     'users.apps.UsersConfig',
+    'recipe.apps.RecipeConfig',
 ]
 
 MIDDLEWARE = [
@@ -134,17 +135,24 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
+    'HIDE_USERS': False,
+    'PERMISSIONS': {
+
+    'user': ['rest_framework.permissions.AllowAny'],
+    'user_list': ['rest_framework.permissions.AllowAny'],
+    },
      'SERIALIZERS': {
-        'user_create': 'users.serializers.UserRegistrationSerializer',
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
     }
 }
 
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-# ]
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 CORS_URLS_REGEX = r'^/api/.*$' 
-
+# CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = [
 #      '<http://localhost:3000>',  # The default port for create-react-app
 # ]

@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'users.apps.UsersConfig',
     'recipe.apps.RecipeConfig',
+    'csv_import.apps.CsvImportConfig',
 ]
 
 MIDDLEWARE = [

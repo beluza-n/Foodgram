@@ -1,3 +1,4 @@
+from rest_framework import routers
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
@@ -5,10 +6,20 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 from rest_framework.authtoken import views
 from users.views import APISubscribe, APISubscriptions
+from recipe.views import RecipeViewSet
+
+router = routers.DefaultRouter()
+router.register(r'recipes', RecipeViewSet)
 
 urlpatterns = [
+    path('api/', include(router.urls)),
+    
     path('api/users/subscriptions/', APISubscriptions.as_view()), 
     path('admin/', admin.site.urls),
     # path('api/auth/token/login/', views.obtain_auth_token),
@@ -40,3 +51,6 @@ urlpatterns += [
    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), 
        name='schema-redoc'),
 ] 
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

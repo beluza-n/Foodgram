@@ -5,8 +5,13 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class Tag(models.Model):
+class Ingredients(models.Model):
+    name = models.CharField(max_length=256, verbose_name='ingredient')
+    measurement_unit = models.CharField(max_length=16, verbose_name='measurement unit')
+
+class Tags(models.Model):
     name = models.CharField(max_length=256, verbose_name='tag')
+    color = models.CharField(max_length=16)
     slug = models.SlugField(
         unique=True,
         max_length=50,
@@ -27,38 +32,24 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='author of the recipe'
     )
-    name = models.CharField(max_length=256, verbose_name='name of the recipe')
-    # image 
+    tags = models.ManyToManyField(
+        Tags, related_name='recipes',
+        blank=True,
+        null=True,
+        verbose_name='recipe tags')
+    image = models.ImageField(
+        upload_to='recipes/images/', 
+        blank=True,
+        null=True
+        )
+    name = models.CharField(max_length=200, verbose_name='name of the recipe')
     text = models.TextField(
         blank=False,
         null=False,
         verbose_name='recipe text')
-    tag = models.ManyToManyField(
-        Tag, related_name='recipes',
-        blank=False,
-        null=False,
-        verbose_name='recipe tags')
+    cooking_time = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1),])
 
-
-
-    year = models.IntegerField(
-        validators=[title_year_validation, ],
-        blank=False,
-        null=False,
-        verbose_name='release year')
-    description = models.TextField(
-        blank=True,
-        null=True,
-        default='',
-        verbose_name='title of the work')
-    genre = models.ManyToManyField(
-        Genre, related_name='titles',
-        blank=True,
-        verbose_name='genre of the work')
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL,
-        related_name='titles', blank=True, null=True,
-        verbose_name='category of the work')
 
     class Meta:
         ordering = ["name"]
@@ -67,3 +58,28 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+class RecipeIngredients(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='ingredients',
+    )
+    
+    name = models.ForeignKey(
+        Ingredients,
+        on_delete=models.CASCADE,
+        related_name='ingredients',
+    )
+
+    amount = models.PositiveSmallIntegerField()
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = 'ingredients'
+        verbose_name_plural = 'ingredients'
+
+    def __str__(self):
+        return self.name
+
+

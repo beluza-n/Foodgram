@@ -105,3 +105,16 @@ class Favorites(models.Model):
 
     def __str__(self):
         f"{self.user} favorites {self.recipe}"
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(User, related_name="shopping_cart", on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, related_name="shopping_cart", on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user','recipe'],  name="unique_shopping_cart")
+        ]
+        ordering = ["-recipe"]
+
+    def __str__(self):
+        f"{self.user} add {self.recipe} to shopping cart"

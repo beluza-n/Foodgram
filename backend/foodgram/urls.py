@@ -11,8 +11,17 @@ from django.conf.urls.static import static
 
 
 from rest_framework.authtoken import views
-from users.views import APISubscribe, APISubscriptions
-from recipe.views import RecipeViewSet, ListIngredientsAPIView, RetrieveIngredientsAPIView, APIFavorites
+from users.views import SubscribeAPIView, SubscriptionsAPIView
+from recipe.views import (
+    RecipeViewSet,
+    ListIngredientsAPIView,
+    RetrieveIngredientsAPIView,
+    ListTagsAPIView,
+    RetrieveTagsAPIView,
+    FavoritesAPIView,
+    ShoppingCartAPIview,
+    DownloadShoppingCartAPIview,
+    )
 
 router = routers.DefaultRouter()
 router.register(r'recipes', RecipeViewSet)
@@ -20,17 +29,23 @@ router.register(r'recipes', RecipeViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/ingredients/', ListIngredientsAPIView.as_view()),
-    path('api/ingredients/<int:pk>', RetrieveIngredientsAPIView.as_view()),
-    path('api/recipes/<int:pk>/favorite/', APIFavorites.as_view()),
-            
-    path('api/users/subscriptions/', APISubscriptions.as_view()), 
+    path('api/ingredients/<int:pk>/', RetrieveIngredientsAPIView.as_view()),
+    path('api/recipes/<int:pk>/favorite/', FavoritesAPIView.as_view()),
+
+    path('api/tags/', ListTagsAPIView.as_view()),
+    path('api/tags/<int:pk>/', RetrieveTagsAPIView.as_view()),
+
+    path('api/recipes/<int:pk>/shopping_cart/', ShoppingCartAPIview.as_view()),
+    path('api/recipes/download_shopping_cart/', DownloadShoppingCartAPIview.as_view()),
+    
+    path('api/users/subscriptions/', SubscriptionsAPIView.as_view()), 
     path('admin/', admin.site.urls),
     # path('api/auth/token/login/', views.obtain_auth_token),
     path('api/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.authtoken')),
     # url(r'^auth/', include('djoser.urls')),
     # url(r'^auth/', include('djoser.urls.authtoken')),
-    path('api/users/<int:pk>/subscribe/', APISubscribe.as_view()),
+    path('api/users/<int:pk>/subscribe/', SubscribeAPIView.as_view()),
 ]
 
 schema_view = get_schema_view(

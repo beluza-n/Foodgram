@@ -18,7 +18,7 @@ User = get_user_model()
 #     queryset = models.UserFollowing.objects.all()
 
 
-class APISubscribe(APIView):
+class SubscribeAPIView(APIView):
     """
     Subscribe or unsubscribe.
     """
@@ -45,7 +45,7 @@ class APISubscribe(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class APISubscriptions(APIView):
+class SubscriptionsAPIView(APIView):
     """
     Show all my subscriptions.
     """

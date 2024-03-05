@@ -4,7 +4,7 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from .models import Recipe, RecipeIngredients, Ingredients, Tags, TagRecipe
-from .mixins import IsFavoritedSerializerMixin
+from .mixins import IsFavoritedSerializerMixin, IsInShoppingCartSerializerMixin
 from users.serializers import CustomUserSerializer
 
 
@@ -31,12 +31,8 @@ class RecipeIngredientsResponseSerializer(serializers.ModelSerializer):
         model = RecipeIngredients
         fields = ('id', 'name', 'measurement_unit','amount')
 
-class TagsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tags
-        fields = ('id',)
 
-class TagsResponseSerializer(serializers.ModelSerializer):
+class TagsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
         fields = ('id', 'name', 'color', 'slug')
@@ -107,15 +103,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         return RecipeResponseSerializer(context=self.context).to_representation(data)
         
 
-class RecipeResponseSerializer(serializers.ModelSerializer, IsFavoritedSerializerMixin):
-    tags = TagsResponseSerializer(required=False, many=True)
+class RecipeResponseSerializer(serializers.ModelSerializer, IsFavoritedSerializerMixin, IsInShoppingCartSerializerMixin):
+    tags = TagsSerializer(required=False, many=True)
     image = Base64ImageField(required=False, allow_null=True)
     author = CustomUserSerializer()
     ingredients = RecipeIngredientsResponseSerializer(many=True)
     
     class Meta:
         model = Recipe
-        fields = ('id', 'author', 'ingredients', 'tags', 'name', 'image', 'text', 'cooking_time', 'is_favorited')
+        fields = ('id', 'author', 'ingredients', 'tags', 'name', 'image', 'text', 'cooking_time', 'is_favorited', 'is_in_shopping_cart',)
         read_only_fields = ('author',)
 
 

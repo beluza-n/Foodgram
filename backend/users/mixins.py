@@ -4,7 +4,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter
 
 from .models import UserFollowing
-from recipe.models import Favorites
 
 # from .permissions import IsAdminUserOrReadOnly
 
@@ -20,16 +19,7 @@ class IsSubscribedSerializerMixin(serializers.Serializer):
         return is_subscribed
 
 
-class IsFavoritedSerializerMixin(serializers.Serializer):
-    is_favorited = serializers.SerializerMethodField()
 
-    class Meta:
-        fields = ('is_subscribed', )
-
-    def get_is_favorited(self, obj):
-        current_user = self.context.get('request').user
-        is_subscribed = Favorites.objects.filter(user=current_user.id, recipe=obj.id).exists()
-        return is_subscribed
 
 
 # class CreateDestroyViewSet(

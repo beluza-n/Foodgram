@@ -19,12 +19,11 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-
-UserModel = get_user_model()
+User = get_user_model()
 
 class UserFollowing(models.Model):
-    user = models.ForeignKey(UserModel, related_name="following", on_delete=models.CASCADE)
-    following_user = models.ForeignKey(UserModel, related_name="followers", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="following", on_delete=models.CASCADE)
+    following_user = models.ForeignKey(User, related_name="followers", on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:

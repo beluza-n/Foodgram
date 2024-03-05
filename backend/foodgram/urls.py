@@ -27,6 +27,8 @@ router = routers.DefaultRouter()
 router.register(r'recipes', RecipeViewSet)
 
 urlpatterns = [
+    path('api/recipes/download_shopping_cart/', DownloadShoppingCartAPIview.as_view()),
+    
     path('api/', include(router.urls)),
     path('api/ingredients/', ListIngredientsAPIView.as_view()),
     path('api/ingredients/<int:pk>/', RetrieveIngredientsAPIView.as_view()),
@@ -36,7 +38,7 @@ urlpatterns = [
     path('api/tags/<int:pk>/', RetrieveTagsAPIView.as_view()),
 
     path('api/recipes/<int:pk>/shopping_cart/', ShoppingCartAPIview.as_view()),
-    path('api/recipes/download_shopping_cart/', DownloadShoppingCartAPIview.as_view()),
+    
     
     path('api/users/subscriptions/', SubscriptionsAPIView.as_view()), 
     path('admin/', admin.site.urls),

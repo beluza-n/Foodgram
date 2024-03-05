@@ -8,7 +8,13 @@ from django.shortcuts import get_object_or_404
 
 from .models import Recipe, RecipeIngredients, Ingredients, Favorites, ShoppingCart, Tags
 
-from .serializers import RecipeSerializer, IngredientsSerializer, FavoritedRecipeSerializer,TagsSerializer
+from .serializers import (
+    RecipeSerializer,
+    IngredientsSerializer,
+    FavoritedRecipeSerializer,
+    TagsSerializer,
+    DownloadShoppingCartSerializer)
+
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -94,4 +100,13 @@ class DownloadShoppingCartAPIview(APIView):
     """
     Download file with sum of ingredients.
     """
-    pass
+    def get(self, request, format=None):
+        # recipes_in_shopping_cart=Recipe.objects.filter(is_in_shopping_cart=True)
+        # serializer = FavoritedRecipeSerializer(recipes_in_shopping_cart, many=True)
+
+        recipe_ingredients = RecipeIngredients.objects.filter(
+            recipe__shopping_cart__user=request.user)
+
+        # recipe_ingredients = RecipeIngredients.objects.filter(recipe_id=1)
+        serializer = DownloadShoppingCartSerializer(recipe_ingredients, many=True)
+        return Response(serializer.data)

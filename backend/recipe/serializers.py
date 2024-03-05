@@ -122,3 +122,12 @@ class FavoritedRecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
+class DownloadShoppingCartSerializer(serializers.ModelSerializer):
+    ingredient_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RecipeIngredients
+        fields = '__all__'
+
+    def get_ingredient_amount(self, obj):
+        return f'{obj.name.name} ({obj.name.measurement_unit}) - {obj.amount}'

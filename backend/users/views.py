@@ -54,8 +54,8 @@ class SubscriptionsAPIView(APIView):
         subscribed_to = current_user.following.all().values_list('following_user_id')
         queryset = User.objects.filter(id__in = subscribed_to)
 
-        profiles = User.objects.filter(
-            owner__subscribed_to__subscriber=request.user)
+        # profiles = User.objects.filter(
+        #     owner__subscribed_to__subscriber=request.user)
         serializer = CustomUserSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
         

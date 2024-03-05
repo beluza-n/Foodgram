@@ -32,11 +32,12 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='author of the recipe'
     )
-    tags = models.ManyToManyField(
-        Tags, related_name='recipes',
-        blank=True,
-        null=True,
-        verbose_name='recipe tags')
+    # tags = models.ManyToManyField(
+    #     Tags, related_name='recipes',
+    #     blank=True,
+    #     null=True,
+    #     verbose_name='recipe tags')
+    tags = models.ManyToManyField(Tags, through='TagRecipe')
     image = models.ImageField(
         upload_to='recipes/images/', 
         blank=True,
@@ -58,6 +59,14 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TagRecipe(models.Model):
+    tag = models.ForeignKey(Tags, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.tag} {self.recipe}'
 
 class RecipeIngredients(models.Model):
     recipe = models.ForeignKey(

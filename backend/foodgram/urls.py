@@ -12,14 +12,17 @@ from django.conf.urls.static import static
 
 from rest_framework.authtoken import views
 from users.views import APISubscribe, APISubscriptions
-from recipe.views import RecipeViewSet
+from recipe.views import RecipeViewSet, ListIngredientsAPIView, RetrieveIngredientsAPIView, APIFavorites
 
 router = routers.DefaultRouter()
 router.register(r'recipes', RecipeViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    
+    path('api/ingredients/', ListIngredientsAPIView.as_view()),
+    path('api/ingredients/<int:pk>', RetrieveIngredientsAPIView.as_view()),
+    path('api/recipes/<int:pk>/favorite/', APIFavorites.as_view()),
+            
     path('api/users/subscriptions/', APISubscriptions.as_view()), 
     path('admin/', admin.site.urls),
     # path('api/auth/token/login/', views.obtain_auth_token),

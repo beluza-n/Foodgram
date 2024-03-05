@@ -30,7 +30,8 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='recipes',
-        verbose_name='author of the recipe'
+        verbose_name='author of the recipe',
+        blank=False, null=False
     )
     # tags = models.ManyToManyField(
     #     Tags, related_name='recipes',
@@ -40,22 +41,22 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(Tags, through='TagRecipe')
     image = models.ImageField(
         upload_to='recipes/images/', 
-        blank=True,
-        null=True
+        blank=False,
+        null=False
         )
-    name = models.CharField(max_length=200, verbose_name='name of the recipe')
+    name = models.CharField(max_length=200, verbose_name='name of the recipe', blank=False, null=False)
     text = models.TextField(
         blank=False,
         null=False,
         verbose_name='recipe text')
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1),])
+        validators=[MinValueValidator(1),], blank=False, null=False,)
 
 
     class Meta:
         ordering = ["name"]
-        verbose_name = 'title'
-        verbose_name_plural = 'titles'
+        verbose_name = 'recipe'
+        verbose_name_plural = 'recipes'
 
     def __str__(self):
         return self.name
@@ -92,3 +93,15 @@ class RecipeIngredients(models.Model):
         return self.name
 
 
+class Favorites(models.Model):
+    user = models.ForeignKey(User, related_name="favorites", on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, related_name="favorites", on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user','recipe'],  name="unique_favorites")
+        ]
+        ordering = ["-recipe"]
+
+    def __str__(self):
+        f"{self.user} favorites {self.recipe}"

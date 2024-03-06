@@ -4,9 +4,13 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.db.models import Sum, F
 
 from .models import Recipe, RecipeIngredients, Ingredients, Favorites, ShoppingCart, Tags
+from .pagination import CustomPageNumberPagination
 
 from .serializers import (
     RecipeSerializer,
@@ -23,7 +27,7 @@ User = get_user_model()
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    pagination_class = PageNumberPagination 
+    pagination_class = CustomPageNumberPagination 
 
 
     def perform_create(self, serializer):
@@ -33,6 +37,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class ListIngredientsAPIView(ListAPIView):
     serializer_class = IngredientsSerializer
     queryset = Ingredients.objects.all()
+    pagination_class = None
 
 class RetrieveIngredientsAPIView(RetrieveAPIView):
     serializer_class = IngredientsSerializer
@@ -42,6 +47,7 @@ class RetrieveIngredientsAPIView(RetrieveAPIView):
 class ListTagsAPIView(ListAPIView):
     serializer_class = TagsSerializer
     queryset = Tags.objects.all()
+    pagination_class = None
 
 class RetrieveTagsAPIView(RetrieveAPIView):
     serializer_class = TagsSerializer
@@ -96,17 +102,31 @@ class ShoppingCartAPIview(APIView):
             return Response({'detail': 'Recipe is not in shopping cart'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
+
 class DownloadShoppingCartAPIview(APIView):
     """
     Download file with sum of ingredients.
     """
     def get(self, request, format=None):
-        # recipes_in_shopping_cart=Recipe.objects.filter(is_in_shopping_cart=True)
-        # serializer = FavoritedRecipeSerializer(recipes_in_shopping_cart, many=True)
-
         recipe_ingredients = RecipeIngredients.objects.filter(
             recipe__shopping_cart__user=request.user)
+        queryset = (recipe_ingredients.values("name_id__name", "name_id__measurement_unit").annotate(sum=Sum(F("amount"))).filter(sum__gt=0).order_by("-sum"))
+        serializer = DownloadShoppingCartSerializer(queryset, many=True)
+        ingredients_list = []
+        ingredients_list = [data.get("ingredient_amount") for data in serializer.data]
+        header = 'Ваш список покупок\n'
+        delimiter = "\n"
+        result_string = header + delimiter.join(ingredients_list)
+        print(result_string)
 
-        # recipe_ingredients = RecipeIngredients.objects.filter(recipe_id=1)
-        serializer = DownloadShoppingCartSerializer(recipe_ingredients, many=True)
-        return Response(serializer.data)
+            
+                
+        filename = 'ShoppingCart.txt'
+        # response = HttpResponse(ingredients_list, content_type='text/plain; charset=UTF-8')
+        response = HttpResponse(result_string, content_type='text/plain; charset=UTF-8')
+        response['Content-Disposition'] = ('attachment; filename={0}'.format(filename))
+        # print(ingredients_list)
+        return response
+        
+        # return Response(ingredients_list)

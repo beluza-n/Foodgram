@@ -122,12 +122,19 @@ class FavoritedRecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
-class DownloadShoppingCartSerializer(serializers.ModelSerializer):
+class DownloadShoppingCartSerializer(serializers.Serializer):
     ingredient_amount = serializers.SerializerMethodField()
 
-    class Meta:
-        model = RecipeIngredients
-        fields = '__all__'
-
     def get_ingredient_amount(self, obj):
-        return f'{obj.name.name} ({obj.name.measurement_unit}) - {obj.amount}'
+        return f"{obj['name_id__name']} ({obj['name_id__measurement_unit']}) - {obj['sum']}"
+    
+# class DownloadShoppingCartSerializer2(serializers.ModelSerializer):
+#     ingredient_amount = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = RecipeIngredients
+#         fields = ('ingredient_amount',)
+#         # fields = '__all__'
+
+#     def get_ingredient_amount(self, obj):
+#         return f'{obj.name.name} ({obj.name.measurement_unit}) - {obj.amount}'

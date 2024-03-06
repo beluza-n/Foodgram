@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -45,17 +45,22 @@ class SubscribeAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class SubscriptionsAPIView(APIView):
+# class SubscriptionsAPIView(APIView):
+#     def get(self, request):
+#         current_user = request.user
+#         subscribed_to = current_user.following.all().values_list('following_user_id')
+#         queryset = User.objects.filter(id__in = subscribed_to)
+#         serializer = CustomUserSerializer(queryset, many=True, context={'request': request})
+#         return Response(serializer.data)
+        
+class SubscriptionsAPIView(ListAPIView):
     """
     Show all my subscriptions.
     """
-    def get(self, request):
-        current_user = request.user
+    serializer_class = CustomUserSerializer
+
+    def get_queryset(self):
+        current_user = self.request.user
         subscribed_to = current_user.following.all().values_list('following_user_id')
         queryset = User.objects.filter(id__in = subscribed_to)
-
-        # profiles = User.objects.filter(
-        #     owner__subscribed_to__subscriber=request.user)
-        serializer = CustomUserSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
-        
+        return queryset

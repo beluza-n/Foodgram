@@ -15,7 +15,7 @@ from .pagination import CustomPageNumberPagination
 from .serializers import (
     RecipeSerializer,
     IngredientsSerializer,
-    FavoritedRecipeSerializer,
+    ShortRecipeSerializer,
     TagsSerializer,
     DownloadShoppingCartSerializer)
 
@@ -65,7 +65,7 @@ class FavoritesAPIView(APIView):
         except:
             return Response({'detail': 'Already favorited'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = FavoritedRecipeSerializer(favorited_recipe)
+        serializer = ShortRecipeSerializer(favorited_recipe)
         return Response(serializer.data)
 
     def delete(self, request, pk):
@@ -90,7 +90,7 @@ class ShoppingCartAPIview(APIView):
         except:
             return Response({'detail': 'Already in shopping cart'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = FavoritedRecipeSerializer(recipe)
+        serializer = ShortRecipeSerializer(recipe)
         return Response(serializer.data)
 
     def delete(self, request, pk):

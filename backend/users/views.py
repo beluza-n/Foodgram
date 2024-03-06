@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from .models import UserFollowing
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, CustomUserWithRecipeSerializer
 
 User = get_user_model()
 
@@ -57,7 +57,7 @@ class SubscriptionsAPIView(ListAPIView):
     """
     Show all my subscriptions.
     """
-    serializer_class = CustomUserSerializer
+    serializer_class = CustomUserWithRecipeSerializer
 
     def get_queryset(self):
         current_user = self.request.user

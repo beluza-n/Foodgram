@@ -51,10 +51,11 @@ class Recipe(models.Model):
         verbose_name='recipe text')
     cooking_time = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1),], blank=False, null=False,)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
     class Meta:
-        ordering = ["name"]
+        ordering = ['-created_at']
         verbose_name = 'recipe'
         verbose_name_plural = 'recipes'
 

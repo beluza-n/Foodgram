@@ -115,7 +115,7 @@ class RecipeResponseSerializer(serializers.ModelSerializer, IsFavoritedSerialize
         read_only_fields = ('author',)
 
 
-class FavoritedRecipeSerializer(serializers.ModelSerializer):
+class ShortRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False, allow_null=True)
     
     class Meta:

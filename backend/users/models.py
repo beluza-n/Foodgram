@@ -12,6 +12,7 @@ class CustomUser(AbstractUser):
         unique=True,
     )
     class Meta:
+        ordering = ['email']
         app_label = 'users'
         verbose_name = ("user")
         verbose_name_plural = ("users")

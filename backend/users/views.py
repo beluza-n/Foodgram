@@ -32,7 +32,7 @@ class SubscribeAPIView(APIView):
         except:
             return Response({'detail': 'Already subscribed'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = CustomUserSerializer(follow, context={'request': request})
+        serializer = CustomUserWithRecipeSerializer(follow, context={'request': request})
         return Response(serializer.data)
 
     def delete(self, request, pk):

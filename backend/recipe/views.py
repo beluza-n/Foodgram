@@ -7,10 +7,13 @@ from rest_framework.pagination import PageNumberPagination
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Count, Q, Case, When, BooleanField
 
 from .models import Recipe, RecipeIngredients, Ingredients, Favorites, ShoppingCart, Tags
 from .pagination import CustomPageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .filters import RecipeFilter
 
 from .serializers import (
     RecipeSerializer,
@@ -25,13 +28,41 @@ User = get_user_model()
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    pagination_class = CustomPageNumberPagination 
+    pagination_class = CustomPageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_queryset(self):
+        user = self.request.user
+        user_id = user.id if not user.is_anonymous else None
+        queryset = Recipe.objects.all().annotate(
+            total_favorite=Count(
+                "favorites",
+                filter=Q(favorites__user_id=user_id)
+            ),
+            is_favorited=Case(
+                When(total_favorite__gte=1, then=True),
+                default=False,
+                output_field=BooleanField()
+            )
+        )
+        queryset = queryset.annotate(
+            total_shopping_cart=Count(
+                "shopping_cart",
+                filter=Q(shopping_cart__user_id=user_id)
+            ),
+            is_in_shopping_cart=Case(
+                When(total_shopping_cart__gte=1, then=True),
+                default=False,
+                output_field=BooleanField()
+            )
+        )
+        return queryset
 
 
 class ListIngredientsAPIView(ListAPIView):

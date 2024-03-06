@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'recipe.apps.RecipeConfig',
     'csv_import.apps.CsvImportConfig',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

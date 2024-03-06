@@ -55,21 +55,26 @@ class ShortRecipeSerializer_2(serializers.ModelSerializer):
 
 class CustomUserWithRecipeSerializer(UserSerializer, IsSubscribedSerializerMixin):
     recipes = serializers.SerializerMethodField()
-    # recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
 
 
     class Meta(UserSerializer.Meta):
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes')
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes(self, obj):
         request = self.context['request']
-        recipes_limit = int(request.query_params['recipes_limit'])
-        queryset = Recipe.objects.filter(author_id=obj.id).order_by('-created_at')[:recipes_limit]
-        # serializer = ShortRecipeSerializer(queryset, many=True)
+        recipes_limit = request.query_params.get('recipes_limit', None)
+        if recipes_limit:                
+            queryset = Recipe.objects.filter(author_id=obj.id).order_by('-created_at')[:int(recipes_limit)]
+        else:
+            queryset = Recipe.objects.filter(author_id=obj.id).order_by('-created_at')
         serializer = ShortRecipeSerializer_2(queryset, many=True, read_only=True)
         return serializer.data
-        
+
+    def get_recipes_count(self, obj):
+        queryset = Recipe.objects.filter(author_id=obj.id)
+        return queryset.count()
        
 
 

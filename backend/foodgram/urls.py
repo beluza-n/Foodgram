@@ -24,7 +24,7 @@ from recipe.views import (
     )
 
 router = routers.DefaultRouter()
-router.register(r'recipes', RecipeViewSet)
+router.register(r'recipes', RecipeViewSet, basename="recipe")
 
 urlpatterns = [
     path('api/recipes/download_shopping_cart/', DownloadShoppingCartAPIview.as_view()),

@@ -102,12 +102,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     def to_representation(self, data):
         return RecipeResponseSerializer(context=self.context).to_representation(data)
         
-
-class RecipeResponseSerializer(serializers.ModelSerializer, IsFavoritedSerializerMixin, IsInShoppingCartSerializerMixin):
+# IsFavoritedSerializerMixin, IsInShoppingCartSerializerMixin
+class RecipeResponseSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(required=False, many=True)
     image = Base64ImageField(required=False, allow_null=True)
     author = CustomUserSerializer()
     ingredients = RecipeIngredientsResponseSerializer(many=True)
+    is_favorited = serializers.BooleanField(read_only=True)
+    is_in_shopping_cart = serializers.BooleanField(read_only=True)
     
     class Meta:
         model = Recipe

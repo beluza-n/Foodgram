@@ -2,6 +2,8 @@ import base64
 
 from django.core.files.base import ContentFile
 from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Recipe, RecipeIngredients, Ingredients, Tags, TagRecipe
 from users.serializers import CustomUserSerializer
@@ -16,6 +18,7 @@ class IngredientsSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientsSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(many=False, queryset = Ingredients.objects.all())
+    amount = serializers.IntegerField(required=False, min_value=1)
 
     class Meta:
         model = RecipeIngredients
@@ -23,12 +26,13 @@ class RecipeIngredientsSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientsResponseSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='name.id')
-    name = serializers.CharField(source='name.name')
-    measurement_unit = serializers.CharField(source='name.measurement_unit')
+    name = serializers.CharField(source='name.name', required=False)
+    measurement_unit = serializers.CharField(source='name.measurement_unit', required=False)
 
     class Meta:
         model = RecipeIngredients
         fields = ('id', 'name', 'measurement_unit','amount')
+        read_only_fields = ('name', 'measurement_unit',)
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -52,8 +56,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientsSerializer(required=True, many=True)
     tags = serializers.PrimaryKeyRelatedField(required=True, many=True, queryset=Tags.objects.all(), read_only=False)
     image = Base64ImageField(required=True, allow_null=True)
-    
-    
+            
     class Meta:
         model = Recipe
         fields = ('name', 'text', 'cooking_time', 'ingredients', 'tags', 'image')
@@ -61,6 +64,20 @@ class RecipeSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         kwargs['partial'] = False
         super(RecipeSerializer, self).__init__(*args, **kwargs)
+
+    def validate_tags(self, value):
+        if len(value) == 0:
+            raise serializers.ValidationError('This field is required.')
+        if len(value) != len(set([tag.id for tag in value])):
+            raise serializers.ValidationError('tags must be unique')
+        return value
+
+    def validate_ingredients(self, value):
+        if len(value) == 0:
+            raise serializers.ValidationError('This field is required.')
+        if len(value) != len(set([ingredient['id'] for ingredient in value])):
+            raise serializers.ValidationError('ingredients must be unique')
+        return value
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
@@ -72,8 +89,9 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
         for tag in tags:
             TagRecipe.objects.create(tag=tag, recipe=recipe)
+        recipe.is_favorited = False
+        recipe.is_in_shopping_cart = False
         return recipe
-        # return RecipeResponseSerializer(context=self.context).to_representation(recipe)
     
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
@@ -100,14 +118,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
         
     def to_representation(self, instance):
-        serializer = RecipeResponseSerializer(context=self.context).to_representation(instance)
-        return serializer
-        # return RecipeResponseSerializer(context=self.context).to_representation(instance)        
+        return RecipeResponseSerializer(context=self.context).to_representation(instance)     
         
         
 class RecipeResponseSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(required=False, many=True)
-    image = Base64ImageField(required=False, allow_null=True)
+    # image = Base64ImageField(required=False, allow_null=True)
+    image = serializers.CharField()
     author = CustomUserSerializer()
     ingredients = RecipeIngredientsResponseSerializer(many=True)
     is_favorited = serializers.BooleanField(read_only=True)
@@ -120,7 +137,7 @@ class RecipeResponseSerializer(serializers.ModelSerializer):
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(required=False, allow_null=True)
+    image = serializers.CharField()
     
     class Meta:
         model = Recipe

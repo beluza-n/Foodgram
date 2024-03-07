@@ -5,6 +5,7 @@ from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
+from rest_framework import serializers
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -114,14 +115,17 @@ class FavoritesAPIView(APIView):
     def post(self, request, pk):
         self.check_permissions(request)
         user = request.user
-        favorited_recipe = get_object_or_404(Recipe, pk=pk)
         try:
-            Favorites.objects.create(user=user, recipe=favorited_recipe)
+            recipe = Recipe.objects.get(pk=pk)
+        except:
+            return Response({'detail': 'Recipe does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            Favorites.objects.create(user=user, recipe=recipe)
         except:
             return Response({'detail': 'Already favorited'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ShortRecipeSerializer(favorited_recipe)
-        return Response(serializer.data)
+        serializer = ShortRecipeSerializer(recipe)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk):
         self.check_permissions(request)
@@ -143,14 +147,17 @@ class ShoppingCartAPIview(APIView):
     def post(self, request, pk):
         self.check_permissions(request)
         user = request.user
-        recipe = get_object_or_404(Recipe, pk=pk)
+        try:
+            recipe = Recipe.objects.get(pk=pk)
+        except:
+            return Response({'detail': 'Recipe does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             ShoppingCart.objects.create(user=user, recipe=recipe)
         except:
             return Response({'detail': 'Already in shopping cart'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = ShortRecipeSerializer(recipe)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk):
         self.check_permissions(request)

@@ -38,7 +38,7 @@ class SubscribeAPIView(APIView):
             return Response({'detail': 'Already subscribed'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = CustomUserWithRecipeSerializer(follow, context={'request': request})
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk):
         self.check_permissions(request)

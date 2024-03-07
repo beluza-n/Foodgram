@@ -2,10 +2,12 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from .models import UserFollowing
-from .serializers import CustomUserSerializer, CustomUserWithRecipeSerializer
+from .serializers import CustomUserWithRecipeSerializer
+
 
 User = get_user_model()
 
@@ -22,7 +24,10 @@ class SubscribeAPIView(APIView):
     """
     Subscribe or unsubscribe.
     """
+    permission_classes = (IsAuthenticated, )
+
     def post(self, request, pk):
+        self.check_permissions(request)
         user = request.user
         follow = get_object_or_404(User, pk=pk)
         if user.id == pk:
@@ -36,6 +41,7 @@ class SubscribeAPIView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk):
+        self.check_permissions(request)
         user = request.user
         follow = get_object_or_404(User, pk=pk)
         try:
@@ -58,6 +64,7 @@ class SubscriptionsAPIView(ListAPIView):
     Show all my subscriptions.
     """
     serializer_class = CustomUserWithRecipeSerializer
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         current_user = self.request.user

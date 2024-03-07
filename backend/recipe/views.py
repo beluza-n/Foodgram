@@ -4,6 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import filters
+
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -14,6 +17,8 @@ from .pagination import CustomPageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .filters import RecipeFilter
+from .permissions import ReadOnly, IsAuthorOrReadOnly
+
 
 from .serializers import (
     RecipeSerializer,
@@ -28,10 +33,20 @@ User = get_user_model()
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch','delete', 'head', 'option']
     serializer_class = RecipeSerializer
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return (ReadOnly(),)
+        if self.action == 'create':
+            return (IsAuthenticated(),)
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return (IsAuthorOrReadOnly(),)
+        return (super().get_permissions() )
 
 
     def perform_create(self, serializer):
@@ -68,27 +83,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class ListIngredientsAPIView(ListAPIView):
     serializer_class = IngredientsSerializer
     queryset = Ingredients.objects.all()
+    permission_classes = (AllowAny,)
     pagination_class = None
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
 
 class RetrieveIngredientsAPIView(RetrieveAPIView):
     serializer_class = IngredientsSerializer
     queryset = Ingredients.objects.all()
+    permission_classes = (AllowAny,)
 
 
 class ListTagsAPIView(ListAPIView):
     serializer_class = TagsSerializer
     queryset = Tags.objects.all()
     pagination_class = None
+    permission_classes = (AllowAny,)
 
 class RetrieveTagsAPIView(RetrieveAPIView):
     serializer_class = TagsSerializer
     queryset = Tags.objects.all()
+    permission_classes = (AllowAny,)
 
 class FavoritesAPIView(APIView):
     """
     Add or remove recipe from favorites.
     """
+    permission_classes = (IsAuthenticated, )
+
     def post(self, request, pk):
+        self.check_permissions(request)
         user = request.user
         favorited_recipe = get_object_or_404(Recipe, pk=pk)
         try:
@@ -100,6 +124,7 @@ class FavoritesAPIView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk):
+        self.check_permissions(request)
         user = request.user
         favorited_recipe = get_object_or_404(Recipe, pk=pk)
         try:
@@ -113,7 +138,10 @@ class ShoppingCartAPIview(APIView):
     """
     Add or remove recipe from shopping cart.
     """
+    permission_classes = (IsAuthenticated, )
+
     def post(self, request, pk):
+        self.check_permissions(request)
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         try:
@@ -125,6 +153,7 @@ class ShoppingCartAPIview(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk):
+        self.check_permissions(request)
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         try:
@@ -139,7 +168,10 @@ class DownloadShoppingCartAPIview(APIView):
     """
     Download file with sum of ingredients.
     """
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request, format=None):
+        self.check_permissions(request)
         recipe_ingredients = RecipeIngredients.objects.filter(
             recipe__shopping_cart__user=request.user)
         queryset = (recipe_ingredients.values("name_id__name", "name_id__measurement_unit").annotate(sum=Sum(F("amount"))).filter(sum__gt=0).order_by("-sum"))
@@ -149,15 +181,7 @@ class DownloadShoppingCartAPIview(APIView):
         header = 'Ваш список покупок\n'
         delimiter = "\n"
         result_string = header + delimiter.join(ingredients_list)
-        print(result_string)
-
-            
-                
         filename = 'ShoppingCart.txt'
-        # response = HttpResponse(ingredients_list, content_type='text/plain; charset=UTF-8')
         response = HttpResponse(result_string, content_type='text/plain; charset=UTF-8')
         response['Content-Disposition'] = ('attachment; filename={0}'.format(filename))
-        # print(ingredients_list)
         return response
-        
-        # return Response(ingredients_list)

@@ -4,7 +4,6 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from .models import Recipe, RecipeIngredients, Ingredients, Tags, TagRecipe
-from .mixins import IsFavoritedSerializerMixin, IsInShoppingCartSerializerMixin
 from users.serializers import CustomUserSerializer
 
 
@@ -74,6 +73,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         for tag in tags:
             TagRecipe.objects.create(tag=tag, recipe=recipe)
         return recipe
+        # return RecipeResponseSerializer(context=self.context).to_representation(recipe)
     
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
@@ -99,10 +99,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
         
-    def to_representation(self, data):
-        return RecipeResponseSerializer(context=self.context).to_representation(data)
+    def to_representation(self, instance):
+        serializer = RecipeResponseSerializer(context=self.context).to_representation(instance)
+        return serializer
+        # return RecipeResponseSerializer(context=self.context).to_representation(instance)        
         
-# IsFavoritedSerializerMixin, IsInShoppingCartSerializerMixin
+        
 class RecipeResponseSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(required=False, many=True)
     image = Base64ImageField(required=False, allow_null=True)

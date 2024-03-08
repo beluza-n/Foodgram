@@ -51,14 +51,6 @@ class SubscribeAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# class SubscriptionsAPIView(APIView):
-#     def get(self, request):
-#         current_user = request.user
-#         subscribed_to = current_user.following.all().values_list('following_user_id')
-#         queryset = User.objects.filter(id__in = subscribed_to)
-#         serializer = CustomUserSerializer(queryset, many=True, context={'request': request})
-#         return Response(serializer.data)
-        
 class SubscriptionsAPIView(ListAPIView):
     """
     Show all my subscriptions.
@@ -69,5 +61,5 @@ class SubscriptionsAPIView(ListAPIView):
     def get_queryset(self):
         current_user = self.request.user
         subscribed_to = current_user.following.all().values_list('following_user_id')
-        queryset = User.objects.filter(id__in = subscribed_to)
+        queryset = User.objects.filter(id__in=subscribed_to)
         return queryset

@@ -3,20 +3,20 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework import viewsets
-from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
-from rest_framework import serializers
-
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum, F, Count, Q, Case, When, BooleanField
-
-from .models import Recipe, RecipeIngredients, Ingredients, Favorites, ShoppingCart, Tags
-from .pagination import CustomPageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db import IntegrityError
 
+from .models import (
+    Recipe, RecipeIngredients,
+    Ingredients, Favorites,
+    ShoppingCart, Tags)
+from .pagination import CustomPageNumberPagination
 from .filters import RecipeFilter
 from .permissions import ReadOnly, IsAuthorOrReadOnly
 
@@ -34,7 +34,7 @@ User = get_user_model()
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get', 'post', 'patch','delete', 'head', 'option']
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'option']
     serializer_class = RecipeSerializer
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
@@ -47,8 +47,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return (IsAuthenticated(),)
         if self.action in ['update', 'partial_update', 'destroy']:
             return (IsAuthorOrReadOnly(),)
-        return (super().get_permissions() )
-
+        return (super().get_permissions())
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -89,6 +88,7 @@ class ListIngredientsAPIView(ListAPIView):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
 
+
 class RetrieveIngredientsAPIView(RetrieveAPIView):
     serializer_class = IngredientsSerializer
     queryset = Ingredients.objects.all()
@@ -101,10 +101,12 @@ class ListTagsAPIView(ListAPIView):
     pagination_class = None
     permission_classes = (AllowAny,)
 
+
 class RetrieveTagsAPIView(RetrieveAPIView):
     serializer_class = TagsSerializer
     queryset = Tags.objects.all()
     permission_classes = (AllowAny,)
+
 
 class FavoritesAPIView(APIView):
     """
@@ -117,12 +119,16 @@ class FavoritesAPIView(APIView):
         user = request.user
         try:
             recipe = Recipe.objects.get(pk=pk)
-        except:
-            return Response({'detail': 'Recipe does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Recipe.DoesNotExist:
+            return Response(
+                {'detail': 'Recipe does not exist.'},
+                status=status.HTTP_400_BAD_REQUEST)
         try:
             Favorites.objects.create(user=user, recipe=recipe)
-        except:
-            return Response({'detail': 'Already favorited'}, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
+            return Response(
+                {'detail': 'Already favorited'},
+                status=status.HTTP_400_BAD_REQUEST)
 
         serializer = ShortRecipeSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -130,11 +136,13 @@ class FavoritesAPIView(APIView):
     def delete(self, request, pk):
         self.check_permissions(request)
         user = request.user
-        favorited_recipe = get_object_or_404(Recipe, pk=pk)
+        recipe = get_object_or_404(Recipe, pk=pk)
         try:
-            Favorites.objects.get(user=user, recipe=favorited_recipe).delete()
-        except:
-            return Response({'detail': 'Recipe is not favorited'}, status=status.HTTP_400_BAD_REQUEST)
+            Favorites.objects.get(user=user, recipe=recipe).delete()
+        except Favorites.DoesNotExist:
+            return Response(
+                {'detail': 'Recipe is not favorited'},
+                status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -149,12 +157,16 @@ class ShoppingCartAPIview(APIView):
         user = request.user
         try:
             recipe = Recipe.objects.get(pk=pk)
-        except:
-            return Response({'detail': 'Recipe does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Recipe.DoesNotExist:
+            return Response(
+                {'detail': 'Recipe does not exist.'},
+                status=status.HTTP_400_BAD_REQUEST)
         try:
             ShoppingCart.objects.create(user=user, recipe=recipe)
-        except:
-            return Response({'detail': 'Already in shopping cart'}, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
+            return Response(
+                {'detail': 'Already in shopping cart'},
+                status=status.HTTP_400_BAD_REQUEST)
 
         serializer = ShortRecipeSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -165,10 +177,11 @@ class ShoppingCartAPIview(APIView):
         recipe = get_object_or_404(Recipe, pk=pk)
         try:
             ShoppingCart.objects.get(user=user, recipe=recipe).delete()
-        except:
-            return Response({'detail': 'Recipe is not in shopping cart'}, status=status.HTTP_400_BAD_REQUEST)
+        except ShoppingCart.DoesNotExist:
+            return Response(
+                {'detail': 'Recipe is not in shopping cart'},
+                status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
 
 
 class DownloadShoppingCartAPIview(APIView):
@@ -181,14 +194,22 @@ class DownloadShoppingCartAPIview(APIView):
         self.check_permissions(request)
         recipe_ingredients = RecipeIngredients.objects.filter(
             recipe__shopping_cart__user=request.user)
-        queryset = (recipe_ingredients.values("name_id__name", "name_id__measurement_unit").annotate(sum=Sum(F("amount"))).filter(sum__gt=0).order_by("-sum"))
+        queryset = (recipe_ingredients.
+                    values("name_id__name", "name_id__measurement_unit").
+                    annotate(sum=Sum(F("amount"))).
+                    filter(sum__gt=0).order_by("-sum"))
         serializer = DownloadShoppingCartSerializer(queryset, many=True)
         ingredients_list = []
-        ingredients_list = [data.get("ingredient_amount") for data in serializer.data]
+        ingredients_list = (
+            [data.get("ingredient_amount")
+             for data in serializer.data])
         header = 'Ваш список покупок\n'
         delimiter = "\n"
         result_string = header + delimiter.join(ingredients_list)
         filename = 'ShoppingCart.txt'
-        response = HttpResponse(result_string, content_type='text/plain; charset=UTF-8')
-        response['Content-Disposition'] = ('attachment; filename={0}'.format(filename))
+        response = HttpResponse(result_string,
+                                content_type='text/plain; charset=UTF-8')
+        response['Content-Disposition'] = (
+            'attachment; filename={0}'.format(filename)
+            )
         return response

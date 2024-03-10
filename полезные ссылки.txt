@@ -1,0 +1,40 @@
+Работа с пользователями в Django
+писано создание своей модели пользователя
+https://practicum.yandex.ru/trainer/backend-developer/lesson/61a2be94-e3f4-44df-9747-5ff0e0554b5e/
+
+групповой проект:
+/wind/Dev/api_yamdb
+
+работа с djoser. Переопределение полей сериализатора
+Аутентификация по токену. JWT + Djoser
+https://practicum.yandex.ru/learn/backend-developer/courses/76ea3bf4-38e4-4957-ac14-18e11a6ac640/sprints/234591/topics/e4b3cc86-3dac-4662-a3e7-1d632c90f71d/lessons/b909eacd-21e0-40ae-aece-78954d29bbd2/
+
+документация djoser
+https://djoser.readthedocs.io/en/latest/settings.html#serializers
+
+список сериализиторов для эндпойнтов djoser:
+https://djoser.readthedocs.io/en/latest/settings.html#serializers
+
+список djoser settings:
+https://stackoverflow.com/questions/68321312/creating-user-using-djoser-is-not-storing-data-for-all-fields
+
+первый запуск docker compose
+https://practicum.yandex.ru/learn/backend-developer/courses/3de66565-1df5-43db-adf4-a04a98ec47e0/sprints/234595/topics/9db09401-a9fa-45ad-b02c-2620ca4ff383/lessons/290061a3-698e-462b-bfc5-ec2d10166cf4/
+
+установка npm
+https://practicum.yandex.ru/trainer/backend-developer/lesson/6b7f2337-89c9-4639-b22a-7a526c377004/?searchedText=npm
+
+Посмотреть к какому удаленному репозиторию подключен git можно с помощью git remote -v или git config --get remote.origin.url
+
+following model
+https://stackoverflow.com/questions/58794639/how-to-make-follower-following-system-with-django-model
+
+модель подписки с использованием APIView
+https://stackoverflow.com/questions/65793249/django-rest-api-followers-system
+
+вопрос про is_subscribed
+https://ru.stackoverflow.com/questions/1338477/%D0%9A%D0%B0%D0%BA-%D0%B4%D0%BE%D0%B1%D0%B0%D0%B2%D0%B8%D1%82%D1%8C-%D0%B2-%D1%81%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80-%D0%BF%D0%BE%D0%BB%D0%B5-%D1%81-%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC-%D0%B8%D0%B7-%D0%B4%D1%80%D1%83%D0%B3%D0%BE%D0%B3%D0%BE-%D1%81%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80%D0%B0
+
+
+filtering a queryset based on another queryset
+https://stackoverflow.com/questions/52005636/filtering-a-queryset-based-on-another-queryset

@@ -136,18 +136,18 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeResponseSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(required=False, many=True)
-    image = serializers.SerializerMethodField()
-    # image = serializers.CharField(source='image.url')
+    # image = serializers.SerializerMethodField()
+    image = serializers.CharField(source='image.url')
     # image = Base64ImageField(required=True, allow_null=True)
     author = CustomUserSerializer()
     ingredients = RecipeIngredientsResponseSerializer(many=True)
     is_favorited = serializers.BooleanField(read_only=True)
     is_in_shopping_cart = serializers.BooleanField(read_only=True)
 
-    def get_image(self, instance):
-        request = self.context.get('request')
-        image_url = instance.image.url
-        return request.build_absolute_uri(image_url)
+    # def get_image(self, instance):
+    #     request = self.context.get('request')
+    #     image_url = instance.image.url
+    #     return request.build_absolute_uri(image_url)
 
     class Meta:
         model = Recipe

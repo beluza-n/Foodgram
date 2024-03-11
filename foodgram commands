@@ -49,6 +49,8 @@ sudo docker system prune -af
 sudo docker compose down
 Чтобы удалить и контейнеры, и volumes — выполните команду
 sudo docker compose down -v
+sudo docker compose -f docker-compose.production.yml down -v
+
 
 загрузка данных по ингридиентам
 python manage.py csv_import --path /wind/Dev/foodgram-project-react/data
@@ -102,7 +104,8 @@ https://www.evileg.com/en/post/244/
 Универсальная модель для избранного:
 https://habr.com/ru/articles/723300/
 
-http://127.0.0.1:8000/api/recipes/download_shopping_cart/
+http://127.0.0.1:8000/api/recipes/
+load_shopping_cart/
 статья с аналогичной проблемой со списком покупок:
 https://stackoverflow.com/questions/68201269/get-amount-of-all-used-ingredients-in-ordered-dishes-django-orm-to-make-a-shop
 

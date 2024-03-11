@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
 from django.contrib.auth import get_user_model
 import os
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -13,8 +13,8 @@ DJANGO_SUPERUSER_PASSWORD = os.getenv('DJANGO_SUPERUSER_PASSWORD', '1234')
 DJANGO_SUPERUSER_FIRST_NAME = os.getenv('DJANGO_SUPERUSER_FIRST_NAME', 'admin1')
 DJANGO_SUPERUSER_LAST_NAME = os.getenv('DJANGO_SUPERUSER_LAST_NAME', 'admin1')
 
-class Command(BaseCommand):
 
+class Command(BaseCommand):
 
     def handle(self, *args, **options):
         User.objects.create_user(

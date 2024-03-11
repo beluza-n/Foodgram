@@ -73,10 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -148,7 +144,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.IsAuthenticated',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -160,7 +156,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
 
     'SEARCH_PARAM': 'name'
-} 
+}
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
@@ -168,12 +164,10 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
     'PERMISSIONS': {
-
-    # 'user': ['rest_framework.permissions.AllowAny'],
-    'user': ['users.permissions.MeIsAuthenticated'],
-    'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['users.permissions.MeIsAuthenticated'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
     },
-     'SERIALIZERS': {
+    'SERIALIZERS': {
         'user_create': 'users.serializers.CustomUserCreateSerializer',
         'user': 'users.serializers.CustomUserSerializer',
         'current_user': 'users.serializers.CustomUserSerializer',
@@ -183,9 +177,4 @@ DJOSER = {
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
-CORS_URLS_REGEX = r'^/api/.*$' 
-# CORS_ORIGIN_ALLOW_ALL = True
-# CORS_ORIGIN_WHITELIST = [
-#      '<http://localhost:3000>',  # The default port for create-react-app
-# ]
-
+CORS_URLS_REGEX = r'^/api/.*$'

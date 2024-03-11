@@ -9,8 +9,6 @@ from drf_yasg import openapi
 from django.conf import settings
 from django.conf.urls.static import static
 
-
-from rest_framework.authtoken import views
 from users.views import SubscribeAPIView, SubscriptionsAPIView
 from recipe.views import (
     RecipeViewSet,
@@ -27,26 +25,19 @@ router = routers.DefaultRouter()
 router.register(r'recipes', RecipeViewSet, basename="recipe")
 
 urlpatterns = [
-    path('api/recipes/download_shopping_cart/', DownloadShoppingCartAPIview.as_view()),
-    
+    path('api/recipes/download_shopping_cart/',
+         DownloadShoppingCartAPIview.as_view()),
     path('api/', include(router.urls)),
     path('api/ingredients/', ListIngredientsAPIView.as_view()),
     path('api/ingredients/<int:pk>/', RetrieveIngredientsAPIView.as_view()),
     path('api/recipes/<int:pk>/favorite/', FavoritesAPIView.as_view()),
-
     path('api/tags/', ListTagsAPIView.as_view()),
     path('api/tags/<int:pk>/', RetrieveTagsAPIView.as_view()),
-
     path('api/recipes/<int:pk>/shopping_cart/', ShoppingCartAPIview.as_view()),
-    
-    
-    path('api/users/subscriptions/', SubscriptionsAPIView.as_view()), 
+    path('api/users/subscriptions/', SubscriptionsAPIView.as_view()),
     path('admin/', admin.site.urls),
-    # path('api/auth/token/login/', views.obtain_auth_token),
     path('api/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.authtoken')),
-    # url(r'^auth/', include('djoser.urls')),
-    # url(r'^auth/', include('djoser.urls.authtoken')),
     path('api/users/<int:pk>/subscribe/', SubscribeAPIView.as_view()),
 ]
 
@@ -55,7 +46,6 @@ schema_view = get_schema_view(
       title="Foodgram API",
       default_version='v1',
       description="Документация проекта Foodgram",
-      # terms_of_service="URL страницы с пользовательским соглашением",
       contact=openapi.Contact(email="admin@foodgram.ru"),
       license=openapi.License(name="BSD License"),
    ),
@@ -64,13 +54,15 @@ schema_view = get_schema_view(
 )
 
 urlpatterns += [
-   url(r'^swagger(?P<format>\.json|\.yaml)$', 
+   url(r'^swagger(?P<format>\.json|\.yaml)$',
        schema_view.without_ui(cache_timeout=0), name='schema-json'),
-   url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), 
+   url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
        name='schema-swagger-ui'),
-   url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), 
+   url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0),
        name='schema-redoc'),
-] 
+]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT)

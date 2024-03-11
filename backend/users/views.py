@@ -5,19 +5,12 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
+
 from .models import UserFollowing
 from .serializers import CustomUserWithRecipeSerializer
 
-
 User = get_user_model()
-
-# from serializers import UserFollowingSerializer
-
-
-# class UserFollowingViewSet(viewsets.ModelViewSet):
-#     # permission_classes = (IsAuthenticatedOrReadOnly,)
-#     serializer_class = UserFollowingSerializer
-#     queryset = models.UserFollowing.objects.all()
 
 
 class SubscribeAPIView(APIView):
@@ -31,13 +24,19 @@ class SubscribeAPIView(APIView):
         user = request.user
         follow = get_object_or_404(User, pk=pk)
         if user.id == pk:
-            return Response({'detail': 'Cannot subscribe to youself'}, status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'detail': 'Cannot subscribe to youself'},
+                status.HTTP_400_BAD_REQUEST)
         try:
             UserFollowing.objects.create(user=user, following_user=follow)
-        except:
-            return Response({'detail': 'Already subscribed'}, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
+            return Response(
+                {'detail': 'Already subscribed'},
+                status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = CustomUserWithRecipeSerializer(follow, context={'request': request})
+        serializer = CustomUserWithRecipeSerializer(
+            follow,
+            context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk):
@@ -45,9 +44,12 @@ class SubscribeAPIView(APIView):
         user = request.user
         follow = get_object_or_404(User, pk=pk)
         try:
-            UserFollowing.objects.get(user=user, following_user=follow).delete()
-        except:
-            return Response({'detail': 'You are not subscribed'}, status=status.HTTP_400_BAD_REQUEST)
+            UserFollowing.objects.get(user=user,
+                                      following_user=follow).delete()
+        except UserFollowing.DoesNotExist:
+            return Response(
+                {'detail': 'You are not subscribed'},
+                status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -60,6 +62,7 @@ class SubscriptionsAPIView(ListAPIView):
 
     def get_queryset(self):
         current_user = self.request.user
-        subscribed_to = current_user.following.all().values_list('following_user_id')
+        subscribed_to = (current_user.following.all().
+                         values_list('following_user_id'))
         queryset = User.objects.filter(id__in=subscribed_to)
         return queryset

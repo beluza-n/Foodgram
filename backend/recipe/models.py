@@ -57,7 +57,7 @@ class Recipe(models.Model):
         null=False,
         verbose_name='recipe text')
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1),], blank=False, null=False,)
+        validators=[MinValueValidator(1), ], blank=False, null=False,)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -74,7 +74,6 @@ class TagRecipe(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
     def __str__(self):
-        # return f'{self.tag} {self.recipe}'
         return self.tag.name
 
 

@@ -156,7 +156,7 @@ class RecipeResponseSerializer(serializers.ModelSerializer):
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
-    image = serializers.CharField()
+    image = serializers.CharField(source='image.url')
 
     class Meta:
         model = Recipe

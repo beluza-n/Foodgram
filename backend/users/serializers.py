@@ -35,7 +35,7 @@ class CustomUserSerializer(UserSerializer, IsSubscribedSerializerMixin):
 
 
 class ShortRecipeSerializer_2(serializers.ModelSerializer):
-    image = serializers.CharField()
+    image = serializers.CharField(source='image.url')
 
     class Meta:
         model = Recipe

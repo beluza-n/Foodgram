@@ -168,4 +168,4 @@ class DownloadShoppingCartSerializer(serializers.Serializer):
 
     def get_ingredient_amount(self, obj):
         return (f"{obj['name_id__name']} "
-                "({obj['name_id__measurement_unit']}) - {obj['sum']}")
+                f"({obj['name_id__measurement_unit']}) - {obj['sum']}")

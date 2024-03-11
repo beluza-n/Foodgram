@@ -39,6 +39,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    ordering = ('-created_at',) 
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -77,7 +78,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 output_field=BooleanField()
             )
         )
-        return queryset
+        return queryset.order_by('-created_at')
 
 
 class ListIngredientsAPIView(ListAPIView):

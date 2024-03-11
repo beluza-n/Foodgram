@@ -211,6 +211,5 @@ class DownloadShoppingCartAPIview(APIView):
         response = HttpResponse(result_string,
                                 content_type='text/plain; charset=UTF-8')
         response['Content-Disposition'] = (
-            'attachment; filename={0}'.format(filename)
-            )
+            'attachment; filename={0}'.format(filename))
         return response

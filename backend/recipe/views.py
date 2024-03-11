@@ -39,7 +39,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    ordering = ('-created_at',) 
+    ordering = ('-created_at',)
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:

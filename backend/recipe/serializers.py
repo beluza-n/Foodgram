@@ -96,8 +96,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             RecipeIngredients.objects.create(
                 recipe=recipe,
                 name=ingredient['id'],
-                amount=ingredient['amount']
-                )
+                amount=ingredient['amount'])
         for tag in tags:
             TagRecipe.objects.create(tag=tag, recipe=recipe)
         recipe.is_favorited = False
@@ -108,8 +107,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
         instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-            )
+            'cooking_time', instance.cooking_time)
         instance.image = validated_data.get('image', instance.image)
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -119,8 +117,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             RecipeIngredients.objects.create(
                 recipe=instance,
                 name=ingredient['id'],
-                amount=ingredient['amount']
-                )
+                amount=ingredient['amount'])
         lst_tags = []
         for tag in tags:
             lst_tags.append(tag)

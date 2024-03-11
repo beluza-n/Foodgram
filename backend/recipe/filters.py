@@ -17,9 +17,7 @@ class RecipeFilter(django_filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = (
-            'author',
-            )
+        fields = ('author',)
 
     def filter_is_favorited(self, queryset, name, value):
         if value is not None:

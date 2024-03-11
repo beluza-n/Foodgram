@@ -20,7 +20,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         path = kwargs['path']
-        self.load_ingredients_data(filepath='/'.join([path, 'ingredients.csv']))
+        self.load_ingredients_data(
+            filepath='/'.join([path, 'ingredients.csv']))
 
     def load_ingredients_data(self, filepath):
         # Показать это сообщение, если данные уже есть в БД
@@ -34,11 +35,10 @@ class Command(BaseCommand):
 
         # Загружаем данные в БД
         bulk_list = list()
-        for row in DictReader(open(filepath, encoding="utf-8-sig"), fieldnames=['name', 'measurement_unit']):
+        for row in DictReader(open(filepath, encoding="utf-8-sig"),
+                              fieldnames=['name', 'measurement_unit']):
             ingredient = Ingredients(
                 name=row['name'],
                 measurement_unit=row['measurement_unit'])
             bulk_list.append(ingredient)
         Ingredients.objects.bulk_create(bulk_list)
-
- 

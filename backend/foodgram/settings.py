@@ -16,10 +16,10 @@ SECRET_KEY = 'django-insecure-n79*^$eto#2=x9$2hu#^9%ivtr2u+dy4sv5*#niujiqb^!@_@k
 DEBUG = False
 
 ALLOWED_HOSTS = [
-  'localhost',
-  '127.0.0.1',
-  '158.160.69.126',
-  'wtoe.sytes.net']
+    'localhost',
+    '127.0.0.1',
+    '158.160.69.126',
+    'wtoe.sytes.net']
 
 
 # Application definition

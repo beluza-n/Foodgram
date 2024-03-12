@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.db import IntegrityError
 
 from .models import UserFollowing
 from .serializers import CustomUserWithRecipeSerializer
@@ -27,12 +26,13 @@ class SubscribeAPIView(APIView):
             return Response(
                 {'detail': 'Cannot subscribe to youself'},
                 status.HTTP_400_BAD_REQUEST)
-        try:
-            UserFollowing.objects.create(user=user, following_user=follow)
-        except IntegrityError:
+        if UserFollowing.objects.filter(user=user,
+                                        following_user=follow).exists():
             return Response(
                 {'detail': 'Already subscribed'},
                 status=status.HTTP_400_BAD_REQUEST)
+        else:
+            UserFollowing.objects.create(user=user, following_user=follow)
 
         serializer = CustomUserWithRecipeSerializer(
             follow,

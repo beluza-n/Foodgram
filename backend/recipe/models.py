@@ -1,25 +1,32 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
+
+from . import constants as const
 
 User = get_user_model()
 
 
 class Ingredients(models.Model):
-    name = models.CharField(max_length=256, verbose_name='ingredient')
-    measurement_unit = models.CharField(max_length=16,
-                                        verbose_name='measurement_unit')
+    name = models.CharField(
+        max_length=const.MAX_LENGTH_NAME_CHAR_FIELD,
+        verbose_name='ingredient')
+    measurement_unit = models.CharField(
+        max_length=const.MAX_LENGTH_UNIT_CHAR_FIELD,
+        verbose_name='measurement_unit')
 
     def __str__(self):
         return f'{self.name} ({self.measurement_unit})'
 
 
 class Tags(models.Model):
-    name = models.CharField(max_length=256, verbose_name='tag')
-    color = models.CharField(max_length=16)
+    name = models.CharField(
+        max_length=const.MAX_LENGTH_NAME_CHAR_FIELD,
+        verbose_name='tag')
+    color = models.CharField(max_length=const.MAX_LENGTH_COLOR)
     slug = models.SlugField(
         unique=True,
-        max_length=50,
+        max_length=const.MAX_LENGTH_SLUG,
         verbose_name='slug'
     )
 
@@ -48,7 +55,7 @@ class Recipe(models.Model):
         blank=False,
         null=False)
     name = models.CharField(
-        max_length=200,
+        max_length=const.MAX_LENGTH_NAME_CHAR_FIELD,
         verbose_name='name of the recipe',
         blank=False, null=False)
     text = models.TextField(
@@ -56,7 +63,9 @@ class Recipe(models.Model):
         null=False,
         verbose_name='recipe text')
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), ], blank=False, null=False,)
+        validators=[MinValueValidator(1),
+                    MaxValueValidator(const.MAX_COOKING_TIME)],
+        blank=False, null=False,)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

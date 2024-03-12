@@ -2,12 +2,14 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from . import constants as const
+
 
 class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ["email", "first_name", 'last_name']
     email = models.EmailField(
         verbose_name='email address',
-        max_length=255,
+        max_length=const.MAX_LENGTH_EMAIL,
         unique=True,
     )
 

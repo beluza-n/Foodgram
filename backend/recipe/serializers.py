@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from .models import Recipe, RecipeIngredients, Ingredients, Tags, TagRecipe
 from users.serializers import CustomUserSerializer
+from . import constants as const
 
 
 class IngredientsSerializer(serializers.ModelSerializer):
@@ -18,7 +19,10 @@ class RecipeIngredientsSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         many=False,
         queryset=Ingredients.objects.all())
-    amount = serializers.IntegerField(required=False, min_value=1)
+    amount = serializers.IntegerField(
+        required=False,
+        min_value=const.MIN_AMOUNT,
+        max_value=const.MAX_AMOUNT)
 
     class Meta:
         model = RecipeIngredients
@@ -92,13 +96,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
+        ingredients_list = []
         for ingredient in ingredients:
-            RecipeIngredients.objects.create(
-                recipe=recipe,
-                name=ingredient['id'],
-                amount=ingredient['amount'])
+            ingredients_list.append(
+                RecipeIngredients(
+                    recipe=recipe,
+                    name=ingredient['id'],
+                    amount=ingredient['amount']))
+        RecipeIngredients.objects.bulk_create(ingredients_list)
+        tags_list = []
         for tag in tags:
-            TagRecipe.objects.create(tag=tag, recipe=recipe)
+            tags_list.append(TagRecipe(tag=tag, recipe=recipe))
+        TagRecipe.objects.bulk_create(tags_list)
         recipe.is_favorited = False
         recipe.is_in_shopping_cart = False
         return recipe

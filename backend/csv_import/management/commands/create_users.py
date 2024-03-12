@@ -1,30 +1,20 @@
 from django.core.management import BaseCommand
 from django.contrib.auth import get_user_model
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
+from django.conf import settings
 
 User = get_user_model()
-
-DJANGO_SUPERUSER_USERNAME = os.getenv('DJANGO_SUPERUSER_USERNAME', 'admin1')
-DJANGO_SUPERUSER_EMAIL = os.getenv('DJANGO_SUPERUSER_EMAIL', 'admin1@mail.ru')
-DJANGO_SUPERUSER_PASSWORD = os.getenv('DJANGO_SUPERUSER_PASSWORD', '1234')
-DJANGO_SUPERUSER_FIRST_NAME = os.getenv(
-    'DJANGO_SUPERUSER_FIRST_NAME',
-    'admin1')
-DJANGO_SUPERUSER_LAST_NAME = os.getenv('DJANGO_SUPERUSER_LAST_NAME', 'admin1')
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
         User.objects.create_user(
-            username=DJANGO_SUPERUSER_USERNAME,
-            email=DJANGO_SUPERUSER_EMAIL,
-            password=DJANGO_SUPERUSER_PASSWORD,
-            first_name=DJANGO_SUPERUSER_FIRST_NAME,
-            last_name=DJANGO_SUPERUSER_LAST_NAME,
+            username=settings.DJANGO_SUPERUSER_USERNAME,
+            email=settings.DJANGO_SUPERUSER_EMAIL,
+            password=settings.DJANGO_SUPERUSER_PASSWORD,
+            first_name=settings.DJANGO_SUPERUSER_FIRST_NAME,
+            last_name=settings.DJANGO_SUPERUSER_LAST_NAME,
             is_staff=True,
             is_active=True,
             is_superuser=True

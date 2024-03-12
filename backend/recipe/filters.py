@@ -21,18 +21,10 @@ class RecipeFilter(django_filters.FilterSet):
 
     def filter_is_favorited(self, queryset, name, value):
         if value is not None:
-            if value == 1:
-                return queryset.filter(is_favorited=True)
-            else:
-                return queryset.filter(is_favorited=False)
-        else:
-            return queryset
+            return queryset.filter(is_favorited=value)
+        return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         if value is not None:
-            if value == 1:
-                return queryset.filter(is_in_shopping_cart=True)
-            else:
-                return queryset.filter(is_in_shopping_cart=False)
-        else:
-            return queryset
+            return queryset.filter(is_in_shopping_cart=value)
+        return queryset

@@ -10,7 +10,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum, F, Count, Q, Case, When, BooleanField
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db import IntegrityError
 from django.contrib.auth import get_user_model
 
 from .models import (
@@ -19,7 +18,7 @@ from .models import (
     ShoppingCart, Tags)
 from .pagination import CustomPageNumberPagination
 from .filters import RecipeFilter
-from .permissions import ReadOnly, IsAuthorOrReadOnly
+from .permissions import ReadOnly, IsAuthorOrReadOnly, RecipePermission
 
 
 from .serializers import (
@@ -36,6 +35,7 @@ User = get_user_model()
 class RecipeViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'option']
     serializer_class = RecipeSerializer
+    permission_classes = (RecipePermission,)
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -124,12 +124,12 @@ class FavoritesAPIView(APIView):
             return Response(
                 {'detail': 'Recipe does not exist.'},
                 status=status.HTTP_400_BAD_REQUEST)
-        try:
-            Favorites.objects.create(user=user, recipe=recipe)
-        except IntegrityError:
+        if Favorites.objects.filter(user=user, recipe=recipe).exists():
             return Response(
                 {'detail': 'Already favorited'},
                 status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Favorites.objects.create(user=user, recipe=recipe)
 
         serializer = ShortRecipeSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -162,12 +162,12 @@ class ShoppingCartAPIview(APIView):
             return Response(
                 {'detail': 'Recipe does not exist.'},
                 status=status.HTTP_400_BAD_REQUEST)
-        try:
-            ShoppingCart.objects.create(user=user, recipe=recipe)
-        except IntegrityError:
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
             return Response(
                 {'detail': 'Already in shopping cart'},
                 status=status.HTTP_400_BAD_REQUEST)
+        else:
+            ShoppingCart.objects.create(user=user, recipe=recipe)
 
         serializer = ShortRecipeSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

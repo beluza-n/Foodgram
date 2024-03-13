@@ -80,16 +80,17 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate_tags(self, value):
         if len(value) == 0:
-            raise serializers.ValidationError('This field is required.')
+            raise serializers.ValidationError('Это поле обязательное')
         if len(value) != len(set([tag.id for tag in value])):
-            raise serializers.ValidationError('tags must be unique')
+            raise serializers.ValidationError('Тэги должны быть уникальными')
         return value
 
     def validate_ingredients(self, value):
         if len(value) == 0:
-            raise serializers.ValidationError('This field is required.')
+            raise serializers.ValidationError('Это поле обязательное')
         if len(value) != len(set([ingredient['id'] for ingredient in value])):
-            raise serializers.ValidationError('ingredients must be unique')
+            raise serializers.ValidationError(
+                'Ингридиенты должны быть уникальными')
         return value
 
     def create(self, validated_data):

@@ -122,11 +122,11 @@ class FavoritesAPIView(APIView):
             recipe = Recipe.objects.get(pk=pk)
         except Recipe.DoesNotExist:
             return Response(
-                {'detail': 'Recipe does not exist.'},
+                {'детали': 'Рецепт не существует.'},
                 status=status.HTTP_400_BAD_REQUEST)
         if Favorites.objects.filter(user=user, recipe=recipe).exists():
             return Response(
-                {'detail': 'Already favorited'},
+                {'детали': 'Уже в избранном'},
                 status=status.HTTP_400_BAD_REQUEST)
         else:
             Favorites.objects.create(user=user, recipe=recipe)
@@ -142,7 +142,7 @@ class FavoritesAPIView(APIView):
             Favorites.objects.get(user=user, recipe=recipe).delete()
         except Favorites.DoesNotExist:
             return Response(
-                {'detail': 'Recipe is not favorited'},
+                {'детали': 'Рецепт не в избранном'},
                 status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -160,11 +160,11 @@ class ShoppingCartAPIview(APIView):
             recipe = Recipe.objects.get(pk=pk)
         except Recipe.DoesNotExist:
             return Response(
-                {'detail': 'Recipe does not exist.'},
+                {'детали': 'Рецепт не существует.'},
                 status=status.HTTP_400_BAD_REQUEST)
         if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
             return Response(
-                {'detail': 'Already in shopping cart'},
+                {'детали': 'Уже в корзине'},
                 status=status.HTTP_400_BAD_REQUEST)
         else:
             ShoppingCart.objects.create(user=user, recipe=recipe)
@@ -180,7 +180,7 @@ class ShoppingCartAPIview(APIView):
             ShoppingCart.objects.get(user=user, recipe=recipe).delete()
         except ShoppingCart.DoesNotExist:
             return Response(
-                {'detail': 'Recipe is not in shopping cart'},
+                {'детали': 'Рецепт не в корзине'},
                 status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

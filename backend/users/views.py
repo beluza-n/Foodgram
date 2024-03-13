@@ -24,12 +24,12 @@ class SubscribeAPIView(APIView):
         follow = get_object_or_404(User, pk=pk)
         if user.id == pk:
             return Response(
-                {'detail': 'Cannot subscribe to youself'},
+                {'детали': 'Нельзя подписаться на самого себя'},
                 status.HTTP_400_BAD_REQUEST)
         if UserFollowing.objects.filter(user=user,
                                         following_user=follow).exists():
             return Response(
-                {'detail': 'Already subscribed'},
+                {'детали': 'Уже подписаны'},
                 status=status.HTTP_400_BAD_REQUEST)
         else:
             UserFollowing.objects.create(user=user, following_user=follow)
@@ -48,7 +48,7 @@ class SubscribeAPIView(APIView):
                                       following_user=follow).delete()
         except UserFollowing.DoesNotExist:
             return Response(
-                {'detail': 'You are not subscribed'},
+                {'детали': 'Вы не подписаны'},
                 status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

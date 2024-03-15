@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import Recipe, Ingredients, Tags, RecipeIngredients
 from django.db.models import Count
-from django.forms.models import BaseInlineFormSet
 
 
 class TagsInline(admin.TabularInline):

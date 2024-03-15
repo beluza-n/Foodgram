@@ -36,8 +36,9 @@ sudo docker run --rm -it -p 8000:8000 --name foodgram_frontend_test foodgram_fro
 sudo docker exec -it foodgram_backend_container bash
 
 миграции внутри запущенного контейнера
-sudo docker exec foodgram_backend_container python manage.py migrate 
-
+sudo docker exec -it foodgram-project-react-backend-1 python manage.py migrate
+sudo docker  exec  -it foodgram-project-react-backend-1 python manage.py loaddata recipe_tags.json
+sudo docker  exec  -it foodgram-project-react-backend-1 python manage.py loaddata recipe_ingredients.json
 
 остановка контейнера
 sudo docker container stop foodgram_backend_container

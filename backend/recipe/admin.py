@@ -1,18 +1,31 @@
 from django.contrib import admin
 from .models import Recipe, Ingredients, Tags, RecipeIngredients
 from django.db.models import Count
+from django.forms.models import BaseInlineFormSet
 
 
 class TagsInline(admin.TabularInline):
     model = Recipe.tags.through
     extra = 0
+    min_num = 1
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj=None, **kwargs)
+        formset.validate_min = True
+        return formset
 
 
 class RecipeIngredientsInline(admin.TabularInline):
-    model = RecipeIngredients
+    model = Recipe.recipe_ingredients.through
     extra = 0
+    min_num = 1
     fields = ('name', 'amount', 'units')
     readonly_fields = ('units',)
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj=None, **kwargs)
+        formset.validate_min = True
+        return formset
 
     def units(self, instance):
         return instance.name.measurement_unit

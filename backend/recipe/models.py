@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 from . import constants as const
 
@@ -46,6 +47,10 @@ class Recipe(models.Model):
         verbose_name='author of the recipe',
         blank=False, null=False
     )
+    recipe_ingredients = models.ManyToManyField(
+        Ingredients, through='RecipeIngredients', related_name='recipes',
+        blank=False,
+        verbose_name='recipe ingredients')
     tags = models.ManyToManyField(
         Tags, through='TagRecipe', related_name='recipes',
         blank=False,
@@ -75,6 +80,11 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        pass
+        # if len(self.tags) == 0:
+        #     raise ValidationError('At least one address is required.')
 
 
 class TagRecipe(models.Model):

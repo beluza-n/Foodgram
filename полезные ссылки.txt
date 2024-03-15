@@ -38,3 +38,7 @@ https://ru.stackoverflow.com/questions/1338477/%D0%9A%D0%B0%D0%BA-%D0%B4%D0%BE%D
 
 filtering a queryset based on another queryset
 https://stackoverflow.com/questions/52005636/filtering-a-queryset-based-on-another-queryset
+
+
+статья как настроить обязательные поля в админке
+https://stackoverflow.com/questions/1206903/how-do-i-require-an-inline-in-the-django-admin

@@ -1,35 +1,27 @@
-# praktikum_new_diplom
-Дипломная работа курса Python-разработчик, Яндекс-Практикум, 2024
-Проект Foodgram - сайт с рецептами
-Студент: Анастасия Гречкина, beluza@mail.ru
+# Recipe website "Foodgram" [wtoe.sytes.net](https://wtoe.sytes.net/)
 
-## Описание
-Адрес сайта: wtoe.sytes.net
-Сайт по созданию и управлению рецептами блюд.
-Проект позволяет зарегистрироваться, публиковать рецепты,
-подписываться на пользователей,
-добавлять рецепты в избранное и в корзину покупок.
+## Desicription
+Users can register, publish recipies, subscribe to other users, add recipes to favorites and shopping cart.
 
-### Комментарии для ревьювера:
-Адрес сайта
+## Stack:
+* Python
+* Django Rest Framework
+* djoser
+* React
 
-```
-wtoe.sytes.net
-```
-Ссылка на репозиторий github:
+### How to run the project locally in Docker compose:
+Clone repository and go to it with the terminal:
 
 ```
-https://github.com/beluza-n/foodgram-project-react
+git clone https://github.com/beluza-n/Foodgram.git
 ```
 
-Суперпользователь ревьювера:
+```
+cd Foodgram
+```
+
+Run docker compose:
 
 ```
-Логин: review
-```
-```
-Пароль: review1admin
-```
-```
-e-mail: review@admin.ru
+sudo docker compose up
 ```
